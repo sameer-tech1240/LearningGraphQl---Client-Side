@@ -8,4 +8,8 @@ public interface IInventoryService {
     List<Product> viewProducts();
 
     Product getProductById(int pId);
+
+    String createProduct(Product product);
+
+    String updateProduct(Product product);
 }

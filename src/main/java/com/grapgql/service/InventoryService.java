@@ -41,4 +41,45 @@ public class InventoryService implements IInventoryService {
                 .retrieve("getProductById")
                 .toEntity(Product.class).block();
     }
+
+    @Override
+    public String createProduct(Product product) {
+        String createProductQuery = String.format("""
+                mutation MyMutation {
+                  createProduct(productDto: { price: %f, productName: "%s", productQuantity: %d }) {
+                    id
+                    price
+                    productName
+                    productQuantity
+                  }
+                }""" , product.price(), product.productName(), product.productQuantity());
+        Product response = graphQlClient.document(createProductQuery).retrieve("createProduct").toEntity(Product.class)
+                .block();
+
+        if (response == null) {
+            return "Product creation failed";
+        }
+        return "Product created successfully with id : " + response.id();
+    }
+
+    @Override
+    public String updateProduct(Product product) {
+        String updateProductQuery = String.format("""
+                mutation MyMutation {
+                  updateProductQuantity(id: %d, productQuantity: %d) {
+                    id
+                    price
+                    productName
+                    productQuantity
+                  }
+                }""" , product.id(), product.productQuantity());
+        Product response = graphQlClient.document(updateProductQuery).retrieve("updateProductQuantity").toEntity(Product.class)
+                .block();
+        assert response != null;
+        if(response.id() == 0 || response.productQuantity()==0)
+            return "Product update failed";
+        return "Product updated successfully with id : " + response.id();
+    }
+
+
 }
